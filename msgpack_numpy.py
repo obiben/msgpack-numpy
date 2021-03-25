@@ -102,11 +102,11 @@ def decode(obj, chain=None):
                             dtype=_unpack_dtype(descr))[0]
         elif b'complex' in obj:
             return complex(tostr(obj[b'data']))
-        elif b'__date__' in obj:
+        elif '__date__' in obj:
             return date.fromisoformat(obj['as_str'])
-        elif b'__time__' in obj:
+        elif '__time__' in obj:
             return time.fromisoformat(obj['as_str'])
-        elif b'__timedelta__' in obj:
+        elif '__timedelta__' in obj:
             return timedelta(float(obj['as_str']))
         else:
             return obj if chain is None else chain(obj)
