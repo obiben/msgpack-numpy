@@ -17,6 +17,7 @@ import msgpack
 from msgpack import Packer as _Packer, Unpacker as _Unpacker, \
     unpack as _unpack, unpackb as _unpackb
 import numpy as np
+from datetime import datetime, date, time, timedelta
 
 if sys.version_info >= (3, 0):
     if sys.platform == 'darwin':
@@ -46,7 +47,7 @@ def encode(obj, chain=None):
     """
     Data encoder for serializing numpy data types.
     """
-
+    print(type(obj))
     if isinstance(obj, np.ndarray):
         # If the dtype is structured, store the interface description;
         # otherwise, store the corresponding array protocol type string:
@@ -65,6 +66,12 @@ def encode(obj, chain=None):
         return {b'nd': False,
                 b'type': obj.dtype.str,
                 b'data': num_to_bytes(obj)}
+    elif isinstance(obj, date):
+        return {'__date__': True, 'as_str': obj.strftime('%Y-%m-%d')}
+    elif isinstance(obj, time):
+        return {'__time__': True, 'as_str': obj.strftime('%H:%M:%S.%f')}
+    elif isinstance(obj, timedelta):
+        return {'__timedelta__': True, 'as_str': str(obj.total_seconds())}
     elif isinstance(obj, complex):
         return {b'complex': True,
                 b'data': obj.__repr__()}
@@ -95,6 +102,12 @@ def decode(obj, chain=None):
                             dtype=_unpack_dtype(descr))[0]
         elif b'complex' in obj:
             return complex(tostr(obj[b'data']))
+        elif b'__date__' in obj:
+            return date.fromisoformat(obj['as_str'])
+        elif b'__time__' in obj:
+            return time.fromisoformat(obj['as_str'])
+        elif b'__timedelta__' in obj:
+            return timedelta(float(obj['as_str']))
         else:
             return obj if chain is None else chain(obj)
     except KeyError:
@@ -281,7 +294,7 @@ def patch():
     """
     Monkey patch msgpack module to enable support for serializing numpy types.
     """
-
+    print('allo')
     setattr(msgpack, 'Packer', Packer)
     setattr(msgpack, 'Unpacker', Unpacker)
     setattr(msgpack, 'load', unpack)
