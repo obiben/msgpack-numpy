@@ -66,6 +66,8 @@ def encode(obj, chain=None):
         return {b'nd': False,
                 b'type': obj.dtype.str,
                 b'data': num_to_bytes(obj)}
+    elif isinstance(obj, np.datetime64):
+        return obj.to_datetime().isoformat()
     elif isinstance(obj, date):
         return {'__date__': True, 'as_str': obj.strftime('%Y-%m-%d')}
     elif isinstance(obj, time):
