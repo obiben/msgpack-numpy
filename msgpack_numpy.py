@@ -294,7 +294,6 @@ def patch():
     """
     Monkey patch msgpack module to enable support for serializing numpy types.
     """
-    print('allo')
     setattr(msgpack, 'Packer', Packer)
     setattr(msgpack, 'Unpacker', Unpacker)
     setattr(msgpack, 'load', unpack)
