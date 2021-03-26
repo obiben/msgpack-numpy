@@ -47,7 +47,6 @@ def encode(obj, chain=None):
     """
     Data encoder for serializing numpy data types.
     """
-    print(type(obj))
     if isinstance(obj, np.ndarray):
         # If the dtype is structured, store the interface description;
         # otherwise, store the corresponding array protocol type string:
