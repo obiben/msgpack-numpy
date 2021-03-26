@@ -67,13 +67,13 @@ def encode(obj, chain=None):
                 b'type': obj.dtype.str,
                 b'data': num_to_bytes(obj)}
     elif isinstance(obj, np.datetime64):
-        return obj.to_datetime().isoformat()
+        return obj.astype(datetime).isoformat()
     elif isinstance(obj, date):
-        return {'__date__': True, 'as_str': obj.strftime('%Y-%m-%d')}
+        return obj.strftime('%Y-%m-%d')
     elif isinstance(obj, time):
-        return {'__time__': True, 'as_str': obj.strftime('%H:%M:%S.%f')}
+        return obj.strftime('%H:%M:%S.%f')
     elif isinstance(obj, timedelta):
-        return {'__timedelta__': True, 'as_str': str(obj.total_seconds())}
+        return obj.total_seconds()
     elif isinstance(obj, complex):
         return {b'complex': True,
                 b'data': obj.__repr__()}
@@ -104,12 +104,6 @@ def decode(obj, chain=None):
                             dtype=_unpack_dtype(descr))[0]
         elif b'complex' in obj:
             return complex(tostr(obj[b'data']))
-        elif '__date__' in obj:
-            return date.fromisoformat(obj['as_str'])
-        elif '__time__' in obj:
-            return time.fromisoformat(obj['as_str'])
-        elif '__timedelta__' in obj:
-            return timedelta(float(obj['as_str']))
         else:
             return obj if chain is None else chain(obj)
     except KeyError:
